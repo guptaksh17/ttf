@@ -9,6 +9,7 @@ import { rebuildState } from './bookingAggregate.js';
 import { hasOverlap } from './availability.js';
 import { startRelay } from './outbox/outboxRelay.js';
 import { register, commandRequestsCounter, commandDurationHistogram, concurrencyConflictsCounter } from './metrics.js';
+import { seed } from '../seedReferenceData.js';
 
 dotenv.config();
 
@@ -747,6 +748,33 @@ const isMain = process.argv[1] && (
 );
 
 // --- Admin CRUD Endpoints ---
+
+// TEMPORARY: remove this route after running the initial production seed once. Do not leave a seed-trigger endpoint live indefinitely.
+app.post('/api/admin/run-seed-once', async (req, res) => {
+  const seedSecret = req.headers['x-seed-secret'];
+  const expectedSecret = process.env.SEED_TRIGGER_SECRET;
+
+  if (!expectedSecret || seedSecret !== expectedSecret) {
+    return res.status(403).json({ message: 'Forbidden. Invalid or missing X-Seed-Secret.' });
+  }
+
+  try {
+    console.log('[SeedTrigger] Triggering database seeding process...');
+    await seed(pool);
+    console.log('[SeedTrigger] Database seeding completed successfully.');
+    return res.status(200).json({ 
+      success: true, 
+      message: 'Reference database seeding completed successfully.' 
+    });
+  } catch (error) {
+    console.error('[SeedTrigger] Seeding failed:', error);
+    return res.status(500).json({ 
+      success: false, 
+      message: 'Seeding process failed.', 
+      error: error.message 
+    });
+  }
+});
 
 // Turf CRUD
 app.get('/api/admin/turfs', requireAdmin, async (req, res) => {
