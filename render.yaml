@@ -14,18 +14,20 @@ services:
           name: taptoturf-db
           property: connectionString
       - key: REDIS_URL
-        fromKeyValue:
+        fromService:
+          type: keyvalue
           name: taptoturf-redis
           property: connectionString
       - key: FRONTEND_URL
-        value: http://localhost:5173  # PLACEHOLDER: Update with Cloudflare Pages frontend URL once deployed
+        value: http://localhost:5173  # PLACEHOLDER: update with Cloudflare Pages URL once deployed
       - key: JWT_SECRET
         generateValue: true
 
+  - type: keyvalue
+    name: taptoturf-redis
+    plan: free
+    ipAllowList: []   # required field for Key Value instances; empty list blocks all external access, which is correct since only the web service needs internal access
+
 databases:
   - name: taptoturf-db
-    plan: free
-
-keyvalue:
-  - name: taptoturf-redis
     plan: free
