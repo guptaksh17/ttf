@@ -1,0 +1,80 @@
+version: '3.8'
+
+services:
+  command-api:
+    build:
+      context: .
+      dockerfile: Dockerfile.command-api
+    container_name: command-api
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://kshitijgupta@host.docker.internal:5432/taptoturf_dev
+      - REDIS_URL=redis://host.docker.internal:6379
+      - IGNORE_REDIS_STARTUP_ERROR=true
+      - TEST_ARTIFICIAL_DELAY_MS=${TEST_ARTIFICIAL_DELAY_MS:-0}
+      - PORT=3000
+      - DISABLE_OUTBOX_RELAY=${DISABLE_OUTBOX_RELAY:-false}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - chaos-net
+
+  availability-projection:
+    build:
+      context: .
+      dockerfile: Dockerfile.availability-projection
+    environment:
+      - DATABASE_URL=postgresql://kshitijgupta@host.docker.internal:5432/taptoturf_dev
+      - REDIS_URL=redis://host.docker.internal:6379
+      - IGNORE_REDIS_STARTUP_ERROR=true
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - chaos-net
+
+  booking-history-projection:
+    build:
+      context: .
+      dockerfile: Dockerfile.booking-history-projection
+    container_name: booking-history-projection
+    environment:
+      - DATABASE_URL=postgresql://kshitijgupta@host.docker.internal:5432/taptoturf_dev
+      - REDIS_URL=redis://host.docker.internal:6379
+      - IGNORE_REDIS_STARTUP_ERROR=true
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - chaos-net
+
+  booking-saga:
+    build:
+      context: .
+      dockerfile: Dockerfile.booking-saga
+    container_name: booking-saga
+    environment:
+      - DATABASE_URL=postgresql://kshitijgupta@host.docker.internal:5432/taptoturf_dev
+      - REDIS_URL=redis://host.docker.internal:6379
+      - IGNORE_REDIS_STARTUP_ERROR=true
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - chaos-net
+
+  expiry-sweeper:
+    build:
+      context: .
+      dockerfile: Dockerfile.expiry-sweeper
+    container_name: expiry-sweeper
+    environment:
+      - DATABASE_URL=postgresql://kshitijgupta@host.docker.internal:5432/taptoturf_dev
+      - REDIS_URL=redis://host.docker.internal:6379
+      - IGNORE_REDIS_STARTUP_ERROR=true
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    networks:
+      - chaos-net
+
+networks:
+  chaos-net:
+    driver: bridge

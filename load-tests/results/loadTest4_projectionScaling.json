@@ -1,0 +1,10 @@
+[
+  {
+    "replicaCount": 1,
+    "targetCount": 100,
+    "timeMs": 639,
+    "throughput": 156.49,
+    "dbTimes": [],
+    "lockContentionObserved": false
+  }
+]

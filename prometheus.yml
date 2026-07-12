@@ -1,0 +1,20 @@
+global:
+  scrape_interval: 5s
+  evaluation_interval: 5s
+
+scrape_configs:
+  - job_name: 'command-api'
+    static_configs:
+      - targets: ['command-api:3000']
+
+  - job_name: 'availability-projection'
+    static_configs:
+      - targets: ['availability-projection:3001']
+
+  - job_name: 'booking-history-projection'
+    static_configs:
+      - targets: ['booking-history-projection:3002']
+
+  - job_name: 'booking-saga'
+    static_configs:
+      - targets: ['booking-saga:3003']

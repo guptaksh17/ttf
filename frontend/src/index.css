@@ -1,0 +1,41 @@
+@import "tailwindcss";
+
+@theme {
+  --font-serif: "Fraunces", Georgia, serif;
+  --font-sans: "Inter", system-ui, sans-serif;
+  --background-image-dotted-grid: radial-gradient(circle, #e4e4e7 1px, transparent 1px);
+  --background-image-dotted-grid-dark: radial-gradient(circle, #27272a 1px, transparent 1px);
+}
+
+@utility dotted-grid {
+  background-image: var(--background-image-dotted-grid);
+}
+
+@utility dotted-grid-dark {
+  background-image: var(--background-image-dotted-grid-dark);
+}
+
+@layer base {
+  body {
+    @apply bg-[#fafaf9] text-neutral-800 font-sans antialiased selection:bg-neutral-900 selection:text-white;
+  }
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-serif;
+  }
+}
+
+/* Custom premium scrollbar */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #d4d4d8;
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #737373;
+}

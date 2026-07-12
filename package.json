@@ -1,0 +1,26 @@
+{
+  "name": "taptoturf",
+  "version": "1.0.0",
+  "description": "Event-Sourced Turf Booking System",
+  "main": "testPhase1.js",
+  "type": "module",
+  "scripts": {
+    "db:migrate": "node dbMigrate.js",
+    "db:seed": "node seedReferenceData.js",
+    "seed": "npm run db:seed",
+    "ws:start": "node src/wsGateway.js",
+    "test": "node testPhase1.js && node testPhase2_race.js && node testPhase2_adjacent.js && node testPhase3.js && node testPhase4_paymentFailedSaga.js && node testPhase4_expirySweep.js"
+  },
+  "dependencies": {
+    "autocannon": "^8.0.0",
+    "bcrypt": "^6.0.0",
+    "cors": "^2.8.6",
+    "dotenv": "^16.4.5",
+    "express": "^5.2.1",
+    "ioredis": "^5.11.1",
+    "jsonwebtoken": "^9.0.3",
+    "pg": "^8.12.0",
+    "prom-client": "^15.1.3",
+    "ws": "^8.21.0"
+  }
+}

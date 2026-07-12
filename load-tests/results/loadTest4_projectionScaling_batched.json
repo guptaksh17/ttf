@@ -1,0 +1,11 @@
+[
+  {
+    "replicaCount": 1,
+    "targetCount": 100,
+    "timeMs": 640,
+    "throughput": 156.25,
+    "avgBatchWriteDuration": "N/A",
+    "avgBatchSize": "N/A",
+    "lockContentionObserved": false
+  }
+]
