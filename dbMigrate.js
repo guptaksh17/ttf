@@ -8,10 +8,10 @@ dotenv.config();
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const { Pool } = pg;
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
-async function run() {
+export async function runMigrations(connectionString = process.env.DATABASE_URL) {
   console.log('--- Running TapToTurf Database Migrations ---');
+  const pool = new Pool({ connectionString });
   const client = await pool.connect();
   try {
     const migrationsDir = path.join(__dirname, 'migrations');
@@ -32,11 +32,22 @@ async function run() {
   } catch (err) {
     await client.query('ROLLBACK');
     console.error('Migration failed:', err);
-    process.exit(1);
+    throw err;
   } finally {
     client.release();
     await pool.end();
   }
 }
 
-run();
+const isMain = process.argv[1] && (
+  fileURLToPath(import.meta.url) === process.argv[1] ||
+  path.basename(process.argv[1]) === 'dbMigrate.js'
+);
+
+if (isMain) {
+  runMigrations().then(() => {
+    process.exit(0);
+  }).catch((err) => {
+    process.exit(1);
+  });
+}

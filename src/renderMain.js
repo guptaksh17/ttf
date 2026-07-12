@@ -8,6 +8,7 @@ import { startBookingSaga, stopBookingSaga } from './saga/bookingSaga.js';
 import { startExpirySweeper, stopExpirySweeper } from './saga/expirySweeper.js';
 import { startOutboxRelay } from './outbox/outboxRelay.js';
 import { pool } from './eventStore.js';
+import { runMigrations } from '../dbMigrate.js';
 
 dotenv.config();
 
@@ -17,6 +18,16 @@ process.env.DISABLE_OUTBOX_RELAY = 'true';
 const PORT = process.env.PORT || 3000;
 
 console.log('--- Starting Consolidated Render Server ---');
+
+// Execute migrations programmatically at startup
+try {
+  console.log('[Startup] Executing database migrations...');
+  await runMigrations();
+  console.log('[Startup] Database migrations completed successfully.');
+} catch (err) {
+  console.error('[Startup] Fatal: Database migration failed:', err);
+  process.exit(1);
+}
 
 const server = http.createServer(app);
 

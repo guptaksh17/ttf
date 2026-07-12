@@ -5,7 +5,6 @@ services:
     plan: free
     buildCommand: npm install
     startCommand: node src/renderMain.js
-    preDeployCommand: node dbMigrate.js
     envVars:
       - key: PORT
         value: 10000
