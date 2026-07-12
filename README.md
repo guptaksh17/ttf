@@ -12,51 +12,6 @@ TapToTurf treats every state change as an immutable, append-only event, separate
 
 ---
 
-## Architecture Overview
-
-```mermaid
-flowchart TD
-    Client[Client Browser/Test Suite]
-    
-    subgraph Write Path (PostgreSQL)
-        CommandAPI[Command API server.js]
-        EventLog[(event_log)]
-        EventOutbox[(event_outbox)]
-    end
-    
-    subgraph Event Bus (Redis)
-        OutboxRelay[outboxRelay.js]
-        RedisStream[Redis Stream taptoturf:events]
-    end
-    
-    subgraph Read Path & Saga (PostgreSQL & Workers)
-        AvailProjection[availabilityProjection.js]
-        HistProjection[bookingHistoryProjection.js]
-        BookingSaga[bookingSaga.js]
-        ExpirySweeper[expirySweeper.js]
-        
-        AvailView[(availability_view)]
-        HistView[(booking_history_view)]
-    end
-
-    Client -->|POST /api/bookings/reserve| CommandAPI
-    CommandAPI -->|Atomically Write v1-v4| EventLog
-    CommandAPI -->|Atomically Append Outbox| EventOutbox
-    
-    OutboxRelay -->|Polls Outbox & Publishes| RedisStream
-    RedisStream -->|XREADGROUP| AvailProjection
-    RedisStream -->|XREADGROUP| HistProjection
-    RedisStream -->|XREADGROUP| BookingSaga
-    
-    AvailProjection -->|Updates| AvailView
-    HistProjection -->|Updates| HistView
-    
-    BookingSaga -->|Appends Compensation| EventLog
-    ExpirySweeper -->|Polls & Appends Expiry Compensation| EventLog
-    
-    Client -->|GET /api/availability| AvailView
-    Client -->|GET /api/users/:id/bookings| HistView
-```
 
 ### Architectural Concepts Defined
 * **Event Sourcing**: Replaces the traditional "current state" DB table. The system of record is an append-only log of events (`event_log`). The current state of any booking aggregate is dynamically derived by replaying these events sequentially.
