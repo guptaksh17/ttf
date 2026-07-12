@@ -53,18 +53,27 @@ export function requireAdmin(req, res, next) {
 
 const app = express();
 
-const allowedOrigins = new Set([
-  'http://localhost:5173',
-  process.env.FRONTEND_URL
-].filter(Boolean));
-
 app.use(cors({
   origin: function(origin, callback) {
     if (!origin) return callback(null, true);
-    if (allowedOrigins.has(origin)) {
+    
+    // Allow localhost and local IP development
+    if (origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:')) {
       return callback(null, true);
     }
-    callback(new Error('Not allowed by CORS'));
+    
+    // Allow exact FRONTEND_URL env config if matching
+    if (process.env.FRONTEND_URL && origin === process.env.FRONTEND_URL) {
+      return callback(null, true);
+    }
+    
+    // Allow Cloudflare Pages domains (*.pages.dev) dynamically
+    if (origin.endsWith('.pages.dev')) {
+      return callback(null, true);
+    }
+
+    // Gracefully decline CORS headers without throwing a 500 server crash
+    callback(null, false);
   },
   credentials: true
 }));
