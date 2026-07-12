@@ -26,6 +26,6 @@ databases:
   - name: taptoturf-db
     plan: free
 
-keyvalues:
+keyvalue:
   - name: taptoturf-redis
     plan: free
