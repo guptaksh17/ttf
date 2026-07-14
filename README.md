@@ -180,7 +180,7 @@ For $0-tier deployments on hosting platforms like Render, we consolidate the ent
    ```
 2. Configure environment variables in `.env`:
    ```env
-   DATABASE_URL=postgresql://postgres:postgres@localhost:5432/taptoturf_dev
+   DATABASE_URL=postgresql://<username>:<password>@localhost:5432/<database_name>
    REDIS_URL=redis://localhost:6379
    IGNORE_REDIS_STARTUP_ERROR=false
    JWT_SECRET=taptoturf_secret
